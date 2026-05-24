@@ -1,0 +1,9 @@
+/*当运行python app.py的时候，python会自动在后台做一件事：把你的.py文件“翻译”成
+一种计算机能更快读取的中间格式，存成.pyc文件，放在__pycache__文件夹里。
+这个文件夹和.pyc文件都是python自动生成的，我们不需要它们，所以把它们加入.gitignore文件，
+告诉git不要把它们提交到版本库里。
+*/
+__pycache__/
+*.pyc
+venv/
+.env
