@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecMentor</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            padding: 40px 0;
+            background: linear-gradient(135deg, #0f172a, #111827);
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .card {
+            width: 750px;
+            padding: 40px;
+            border-radius: 24px;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        }
+
+        h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            margin-bottom: 35px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        input {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.08);
+            color: white;
+            font-size: 16px;
+            outline: none;
+        }
+
+        input::placeholder {
+            color: #94a3b8;
+        }
+
+        button {
+            padding: 16px 28px;
+            border: none;
+            border-radius: 14px;
+            background: #3b82f6;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        button:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .result-box {
+            margin-top: 30px;
+            padding: 24px;
+            border-radius: 18px;
+            background: rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.08);
+            min-height: 60px;
+            white-space: pre-wrap;
+            line-height: 1.7;
+        }
+
+        .result-title {
+            font-size: 18px;
+            margin-top: 0;
+            margin-bottom: 25px;
+            color: #60a5fa;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <h1>SecMentor</h1>
+    <div class="subtitle">
+        AI Security Vulnerability Analyzer
+    </div>
+
+    <form method="POST">
+
+        <div class="input-group">
+            <input 
+                type="text" 
+                name="vuln"
+                placeholder="请输入漏洞类型..."
+            >
+
+            <button type="submit">
+                分析
+            </button>
+        </div>
+
+    </form>
+
+    <div class="result-box">
+
+        <div class="result-title">
+            分析结果
+        </div>
+
+        {{ result }}
+
+    </div>
+
+</div>
+
+</body>
+</html>
