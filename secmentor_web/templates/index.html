@@ -24,7 +24,8 @@
         }
 
         .card {
-            width: 750px;
+            width: 900px;
+            max-width: 95%;
             padding: 40px;
             border-radius: 24px;
             background: rgba(255,255,255,0.05);
@@ -51,9 +52,9 @@
         input {
             flex: 1;
             padding: 16px;
-            border: none;
+            border:  1px solid rgba(255,255,255,0.25);
             border-radius: 14px;
-            background: rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.12);
             color: white;
             font-size: 16px;
             outline: none;
@@ -80,23 +81,26 @@
         }
 
         .result-box {
-            margin-top: 30px;
-            padding: 24px;
+            margin-top: 16px;
+            padding: 16px 20px;
             border-radius: 18px;
             background: rgba(0,0,0,0.25);
             border: 1px solid rgba(255,255,255,0.08);
-            min-height: 60px;
-            white-space: pre-wrap;
-            line-height: 1.7;
+            border-left: 3px solid #3b82f6;
         }
 
         .result-title {
             font-size: 18px;
             margin-top: 0;
-            margin-bottom: 25px;
+            margin-bottom: 8px;
             color: #60a5fa;
             font-weight: bold;
+            
         }
+        .risk-high { color: #ef4444; }
+        .risk-mid { color: #f59e0b; }
+        .risk-low { color: #22c55e; }
+        .risk-unknown { color: #6b7280; }
     </style>
 </head>
 
@@ -118,22 +122,53 @@
                 placeholder="请输入漏洞类型..."
             >
 
-            <button type="submit">
+            <button type="submit" name="action" value="analyze">
                 分析
             </button>
+            <button type="submit" name="action" value="clear" style="background: #dc2626">
+                清除历史
+            </button>
         </div>
-
     </form>
 
+    {% if result %}
     <div class="result-box">
-
         <div class="result-title">
-            分析结果
+            漏洞类型：{{ result.type }}
+            &nbsp;|&nbsp;
+            风险等级：<span class="{% if result.risk == '高' %}risk-high{% elif result.risk == '中高' %}risk-mid{% elif result.risk == '中' %}risk-mid{% elif result.risk == '低' %}risk-low{% else %}risk-unknown{% endif %}">{{ result.risk }}</span>
+        </div>
+        <div style="color: #cbd5e1; margin-bottom: 12px;">
+            检测依据：{{ result.evidence }}
+        </div>
+        <div style="color: #94a3b8; white-space: pre-wrap; line-height: 1.7;">
+建议：
+{{ result.suggest }}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if history %}
+    <div style="margin-top: 24px; padding: 24px; border-radius: 18px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08);">
+        <div style="font-size: 18px; margin-bottom: 20px; color: #60a5fa; font-weight: bold;">
+            分析历史
         </div>
 
-        {{ result }}
-
+        {% for item in history %}
+        <div style="margin-bottom: 16px; padding: 16px; border-radius: 12px; background: rgba(255,255,255,0.05); border-left: 3px solid #3b82f6;">
+            <div style="color: #94a3b8; font-size: 13px; margin-bottom: 6px;">
+                输入: {{ item[0] }}
+            </div>
+            <div style="font-size: 14px; color: #cbd5e1; margin-bottom: 4px;">
+                {{ item[1].type }} — 风险等级：{{ item[1].risk }}
+            </div>
+            <div style="white-space: pre-wrap; line-height: 1.6; font-size: 13px; color: #94a3b8;">
+{{ item[1].suggest }}
+            </div>
+        </div>
+        {% endfor %}
     </div>
+    {% endif %}
 
 </div>
 

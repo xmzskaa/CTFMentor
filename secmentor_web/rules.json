@@ -1,0 +1,44 @@
+[
+    {
+        "keyword": ["'", "union", "select"],
+        "type": "SQL注入",
+        "risk": "高",
+        "evidence": "发现SQL关键字或单引号注入特征",
+        "suggest": "1. 使用参数化查询\n2. 禁止字符串拼接SQL\n3. 做输入过滤"
+    },
+    {
+        "keyword": ["<script>", "alert("],
+        "type": "XSS",
+        "risk": "中高",
+        "evidence": "发现JavaScript脚本特征",
+        "suggest": "1. 输出转义\n2. 开启 CSP\n3. 过滤危险标签"
+    },
+    {
+        "keyword": [".php", ".jsp"],
+        "type": "恶意文件上传",
+        "risk": "高",
+        "evidence": "发现危险脚本文件后缀",
+        "suggest": "1. 校验文件类型\n2. 限制上传目录执行权限\n3. 重命名上传文件"
+    },
+    {
+        "keyword": [";", "ls", "whoami", "|", "&&"],
+        "type": "命令注入",
+        "risk": "高",
+        "evidence": "发现命令注入特征",
+        "suggest": "1. 输入验证\n2. 使用安全的命令执行方式\n3. 限制系统权限"
+    },
+    {
+        "keyword": ["../", "..\\"],
+        "type": "路径遍历",
+        "risk": "高",
+        "evidence": "发现路径遍历特征",
+        "suggest": "1. 规范化路径\n2. 限制访问范围\n3. 做输入过滤"
+    },
+    {
+        "keyword": ["http://", "127.0.0.1", "localhost"],
+        "type": "SSRF",
+        "risk": "高",
+        "evidence": "发现SSRF特征",
+        "suggest": "1. 验证和过滤URL\n2. 禁止访问内网地址\n3. 使用网络隔离"
+    }
+]
