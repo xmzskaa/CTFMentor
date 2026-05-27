@@ -3,104 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SecMentor</title>
+    <title>CTFMentor</title>
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0d1117;
+            --card-bg: rgba(255,255,255,0.03);
+            --border: rgba(255,255,255,0.08);
+            --text: #e6edf3;
+            --text-secondary: #8b949e;
+            --text-muted: #c9d1d9;
+            --primary: #238636;
+            --primary-hover: #2ea043;
+            --danger: #da3633;
+            --accent: #58a6ff;
+            --tag-bg: rgba(56,139,253,0.15);
+            --tag-text: #58a6ff;
         }
 
         body {
             min-height: 100vh;
             padding: 40px 0;
-            background: linear-gradient(135deg, #0f172a, #111827);
-            font-family: Arial, sans-serif;
+            background: var(--bg);
+            font-family: 'Segoe UI', Arial, sans-serif;
             display: flex;
             justify-content: center;
-            align-items: center;
-            color: white;
+            align-items: flex-start;
+            color: var(--text);
         }
 
         .card {
             width: 900px;
             max-width: 95%;
             padding: 40px;
-            border-radius: 24px;
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            border-radius: 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.03);
         }
 
-        h1 {
-            font-size: 42px;
-            margin-bottom: 10px;
-        }
+        h1 { font-size: 36px; margin-bottom: 6px; letter-spacing: -0.5px; }
+        h1 span { color: var(--primary); }
 
         .subtitle {
-            color: #94a3b8;
-            margin-bottom: 35px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            font-size: 14px;
         }
 
-        .input-group {
+        /* ---- Tab 栏 ---- */
+        .tab-bar {
             display: flex;
-            gap: 12px;
+            gap: 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+        .tab-btn {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--text-secondary);
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-bottom: -1px;
+        }
+        .tab-btn:hover { color: var(--text); }
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
         }
 
-        input {
-            flex: 1;
+        /* ---- Tab 面板 ---- */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        textarea {
+            width: 100%;
+            min-height: 220px;
             padding: 16px;
-            border:  1px solid rgba(255,255,255,0.25);
-            border-radius: 14px;
-            background: rgba(255,255,255,0.12);
-            color: white;
-            font-size: 16px;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            font-size: 14px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            outline: none;
+            resize: vertical;
+            line-height: 1.6;
+        }
+        textarea::placeholder {
+            color: var(--text-secondary);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 14px;
+        }
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(35,134,54,0.15);
+        }
+
+        /* ---- 文件上传区域 ---- */
+        .upload-zone {
+            border: 2px dashed rgba(255,255,255,0.12);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .upload-zone:hover {
+            border-color: var(--primary);
+            background: rgba(35,134,54,0.04);
+        }
+        .upload-zone input[type="file"] { display: none; }
+        .upload-zone .icon { font-size: 32px; margin-bottom: 10px; }
+        .upload-zone .hint { color: var(--text-secondary); font-size: 13px; }
+        .upload-zone .file-name { color: var(--primary); font-size: 14px; margin-top: 8px; }
+
+        .mode-select {
+            padding: 10px 14px;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.06);
+            color: var(--text);
+            font-size: 14px;
+            cursor: pointer;
             outline: none;
         }
+        .mode-select:focus { border-color: var(--primary); }
+        .mode-select option { background: #1a1f2e; color: var(--text); }
 
-        input::placeholder {
-            color: #94a3b8;
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
         }
 
         button {
-            padding: 16px 28px;
+            padding: 12px 28px;
             border: none;
-            border-radius: 14px;
-            background: #3b82f6;
-            color: white;
-            font-size: 16px;
+            border-radius: 8px;
+            font-size: 15px;
             cursor: pointer;
-            transition: 0.25s;
+            transition: 0.2s;
+            font-weight: 500;
         }
-
-        button:hover {
-            background: #2563eb;
-            transform: translateY(-2px);
+        .btn-analyze { background: var(--primary); color: #fff; }
+        .btn-analyze:hover { background: var(--primary-hover); }
+        .btn-clear {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid rgba(255,255,255,0.12);
         }
+        .btn-clear:hover { color: var(--danger); border-color: var(--danger); }
 
+        /* ---- 结果 ---- */
         .result-box {
-            margin-top: 16px;
+            margin-top: 28px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .result-header {
+            display: flex;
+            gap: 10px;
             padding: 16px 20px;
-            border-radius: 18px;
-            background: rgba(0,0,0,0.25);
+            background: rgba(255,255,255,0.03);
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .tag {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            background: var(--tag-bg);
+            color: var(--tag-text);
+            font-weight: 500;
+        }
+        .tag-diff { background: rgba(35,134,54,0.15); color: #3fb950; }
+
+        .result-body { padding: 20px; }
+        .result-section { margin-bottom: 18px; }
+        .result-section:last-child { margin-bottom: 0; }
+        .section-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        .section-content {
+            color: var(--text-muted);
+            line-height: 1.7;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+        .payload-box {
+            background: rgba(0,0,0,0.3);
             border: 1px solid rgba(255,255,255,0.08);
-            border-left: 3px solid #3b82f6;
+            border-radius: 8px;
+            padding: 14px 18px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+            color: #7ee787;
+            overflow-x: auto;
         }
 
-        .result-title {
-            font-size: 18px;
-            margin-top: 0;
-            margin-bottom: 8px;
-            color: #60a5fa;
-            font-weight: bold;
-            
+        /* ---- 历史 ---- */
+        .history-box {
+            margin-top: 28px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
         }
-        .risk-high { color: #ef4444; }
-        .risk-mid { color: #f59e0b; }
-        .risk-low { color: #22c55e; }
-        .risk-unknown { color: #6b7280; }
+        .history-header {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+        .history-item {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .history-item:last-child { border-bottom: none; }
+        .history-input {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .history-meta {
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            gap: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .card { padding: 24px; }
+            h1 { font-size: 28px; }
+            textarea { min-height: 140px; }
+            .btn-row { flex-direction: column; }
+            .result-header { flex-direction: column; align-items: flex-start; }
+            .tab-btn { padding: 8px 14px; font-size: 13px; }
+        }
     </style>
 </head>
 
@@ -108,24 +264,63 @@
 
 <div class="card">
 
-    <h1>SecMentor</h1>
+    <h1>CTF<span>Mentor</span></h1>
     <div class="subtitle">
-        AI Security Vulnerability Analyzer
+        贴题目、传代码、截图 —— AI 分析考点和解题思路
     </div>
 
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
 
-        <div class="input-group">
-            <input 
-                type="text" 
-                name="vuln"
-                placeholder="请输入漏洞类型..."
-            >
+        <!-- Tab 切换栏 -->
+        <div class="tab-bar">
+            <button type="button" class="tab-btn active" data-tab="text">📝 贴文字</button>
+            <button type="button" class="tab-btn" data-tab="code">📎 传代码</button>
+            <button type="button" class="tab-btn" data-tab="image">🖼 传截图</button>
+        </div>
 
-            <button type="submit" name="action" value="analyze">
-                分析
+        <!-- Tab 1: 贴文字 -->
+        <div class="tab-panel active" id="panel-text">
+            <textarea
+                name="description"
+                id="desc-textarea"
+                placeholder="贴入 CTF 题目描述或代码...&#10;&#10;例如：&#10;一道 Web 题给了 PHP 源码，有个 /admin 路由，cookie 里设了 jwt token..."
+            ></textarea>
+        </div>
+
+        <!-- Tab 2: 传代码 -->
+        <div class="tab-panel" id="panel-code">
+            <div class="upload-zone" id="code-zone">
+                <div class="icon">📎</div>
+                <div class="hint">点击选择或拖拽代码文件<br>.py .php .c .cpp .js .java .txt ...</div>
+                <div class="file-name" id="code-name"></div>
+                <input type="file" id="file-input" name="file"
+                    accept=".py,.php,.c,.cpp,.js,.java,.go,.rs,.rb,.pl,.sh,.txt,.html,.css,.xml,.json,.md,.h,.cs,.ts,.sql">
+            </div>
+            <textarea name="description" placeholder="补充说明（可选）..." style="min-height:60px; margin-top:10px;"></textarea>
+        </div>
+
+        <!-- Tab 3: 传截图 -->
+        <div class="tab-panel" id="panel-image">
+            <div class="upload-zone" id="image-zone">
+                <div class="icon">🖼</div>
+                <div class="hint">点击选择 CTF 题目截图<br>.png .jpg .gif .webp</div>
+                <div class="file-name" id="image-name"></div>
+                <input type="file" id="image-input" name="file"
+                    accept="image/*">
+            </div>
+            <textarea name="description" placeholder="补充说明（可选）..." style="min-height:60px; margin-top:10px;"></textarea>
+        </div>
+
+        <!-- 操作栏 -->
+        <div class="btn-row">
+            <select name="mode" class="mode-select">
+                <option value="hint">提示模式</option>
+                <option value="answer">答案模式</option>
+            </select>
+            <button type="submit" name="action" value="analyze" class="btn-analyze">
+                分析题目
             </button>
-            <button type="submit" name="action" value="clear" style="background: #dc2626">
+            <button type="submit" name="action" value="clear" class="btn-clear">
                 清除历史
             </button>
         </div>
@@ -133,37 +328,60 @@
 
     {% if result %}
     <div class="result-box">
-        <div class="result-title">
-            漏洞类型：{{ result.type }}
-            &nbsp;|&nbsp;
-            风险等级：<span class="{% if result.risk == '高' %}risk-high{% elif result.risk == '中高' %}risk-mid{% elif result.risk == '中' %}risk-mid{% elif result.risk == '低' %}risk-low{% else %}risk-unknown{% endif %}">{{ result.risk }}</span>
+        <div class="result-header">
+            <span class="tag">{{ result.category }}</span>
+            <span class="tag">{{ result.technique }}</span>
+            <span class="tag tag-diff">{{ result.difficulty }}</span>
+            {% if result.mode == 'answer' %}
+            <span class="tag" style="background:rgba(218,54,51,0.2);color:#f85149;">答案模式</span>
+            {% endif %}
         </div>
-        <div style="color: #cbd5e1; margin-bottom: 12px;">
-            检测依据：{{ result.evidence }}
-        </div>
-        <div style="color: #94a3b8; white-space: pre-wrap; line-height: 1.7;">
-建议：
-{{ result.suggest }}
+        <div class="result-body">
+            {% if result.mode == 'answer' and result.solution %}
+            <div class="result-section">
+                <div class="section-label">完整解题步骤</div>
+                <div class="section-content">{{ result.solution }}</div>
+            </div>
+            {% else %}
+            <div class="result-section">
+                <div class="section-label">解题思路</div>
+                <div class="section-content">{{ result.hints }}</div>
+            </div>
+            {% endif %}
+            {% if result.payload %}
+            <div class="result-section">
+                <div class="section-label">攻击载荷 / 代码模板</div>
+                <div class="payload-box">{{ result.payload }}</div>
+            </div>
+            {% endif %}
+            {% if result.mode == 'answer' and result.flag %}
+            <div class="result-section">
+                <div class="section-label">Flag</div>
+                <div class="payload-box" style="color:#f85149;">{{ result.flag }}</div>
+            </div>
+            {% endif %}
+            {% if result.pitfalls %}
+            <div class="result-section">
+                <div class="section-label">常见踩坑点</div>
+                <div class="section-content">{{ result.pitfalls }}</div>
+            </div>
+            {% endif %}
         </div>
     </div>
     {% endif %}
 
     {% if history %}
-    <div style="margin-top: 24px; padding: 24px; border-radius: 18px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08);">
-        <div style="font-size: 18px; margin-bottom: 20px; color: #60a5fa; font-weight: bold;">
-            分析历史
-        </div>
-
+    <div class="history-box">
+        <div class="history-header">分析历史</div>
         {% for item in history %}
-        <div style="margin-bottom: 16px; padding: 16px; border-radius: 12px; background: rgba(255,255,255,0.05); border-left: 3px solid #3b82f6;">
-            <div style="color: #94a3b8; font-size: 13px; margin-bottom: 6px;">
-                输入: {{ item[0] }}
-            </div>
-            <div style="font-size: 14px; color: #cbd5e1; margin-bottom: 4px;">
-                {{ item[1].type }} — 风险等级：{{ item[1].risk }}
-            </div>
-            <div style="white-space: pre-wrap; line-height: 1.6; font-size: 13px; color: #94a3b8;">
-{{ item[1].suggest }}
+        <div class="history-item">
+            <div class="history-input">{{ item[0] }}</div>
+            <div class="history-meta">
+                <span>{{ item[1].category }}</span>
+                <span>·</span>
+                <span>{{ item[1].technique }}</span>
+                <span>·</span>
+                <span style="color: #3fb950;">{{ item[1].difficulty }}</span>
             </div>
         </div>
         {% endfor %}
@@ -171,6 +389,50 @@
     {% endif %}
 
 </div>
+
+<script>
+// Tab 切换
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        // 切换按钮激活状态
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        // 切换面板
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+        // 清空上一个 tab 的文件选择（避免后端用错）
+        if (btn.dataset.tab !== 'code') document.getElementById('file-input').value = '';
+        if (btn.dataset.tab !== 'image') document.getElementById('image-input').value = '';
+    });
+});
+
+// 代码上传：点击区域触发选择
+document.getElementById('code-zone').addEventListener('click', () => {
+    document.getElementById('file-input').click();
+});
+document.getElementById('file-input').addEventListener('change', (e) => {
+    document.getElementById('code-name').textContent = '已选择: ' + (e.target.files[0]?.name || '');
+});
+
+// 图片上传：点击区域触发选择
+document.getElementById('image-zone').addEventListener('click', () => {
+    document.getElementById('image-input').click();
+});
+document.getElementById('image-input').addEventListener('change', (e) => {
+    document.getElementById('image-name').textContent = '已选择: ' + (e.target.files[0]?.name || '');
+});
+
+// 表单提交前：禁用非活跃tab内的字段，避免重复name冲突
+document.querySelector('form').addEventListener('submit', () => {
+    const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
+    document.querySelectorAll('.tab-panel').forEach(panel => {
+        const isActive = panel.classList.contains('active');
+        panel.querySelectorAll('textarea, input').forEach(el => {
+            if (el.name && !isActive) el.disabled = true;
+        });
+    });
+});
+</script>
 
 </body>
 </html>
