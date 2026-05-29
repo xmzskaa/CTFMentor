@@ -184,6 +184,8 @@
             font-weight: 500;
         }
         .tag-diff { background: rgba(35,134,54,0.15); color: #3fb950; }
+        .risk-high { color: #f85149; }
+        .risk-medium { color: #d29922; }
 
         .result-body { padding: 20px; }
         .result-section { margin-bottom: 18px; }
@@ -344,7 +346,7 @@
                 <div style="margin-bottom:8px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;">
                     <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px;">
                         <span class="tag" style="background:rgba(209,36,47,0.15);color:#f85149;">{{ f.type }}</span>
-                        <span style="font-size:12px;font-weight:500;{% if f.risk == '高' %}color:#f85149{% else %}color:#d29922{% endif %};">{{ f.risk }}风险</span>
+                        <span class="risk-{% if f.risk == '高' %}high{% else %}medium{% endif %}" style="font-size:12px;font-weight:500;">{{ f.risk }}风险</span>
                     </div>
                     <div style="font-size:13px;color:var(--text-muted);line-height:1.6;">
                         <div>{{ f.evidence }}</div>
