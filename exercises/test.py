@@ -1,5 +1,5 @@
 #Flask依赖一个实现wsgi协议的模块：Werkzeug
-from werkzegu.wrappers import Request, Response
+from werkzeug.wrappers import Request, Response
 
 @Request.application
 def hello(request):

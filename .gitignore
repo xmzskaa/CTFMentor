@@ -6,3 +6,4 @@ venv/
 .claude/settings.local.json
 settings.local.json
 *.png
+history.json

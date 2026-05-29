@@ -337,6 +337,23 @@
             {% endif %}
         </div>
         <div class="result-body">
+            {% if local_findings %}
+            <div class="result-section">
+                <div class="section-label">本地规则匹配</div>
+                {% for f in local_findings %}
+                <div style="margin-bottom:8px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;">
+                    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px;">
+                        <span class="tag" style="background:rgba(209,36,47,0.15);color:#f85149;">{{ f.type }}</span>
+                        <span style="font-size:12px;font-weight:500;{% if f.risk == '高' %}color:#f85149{% else %}color:#d29922{% endif %};">{{ f.risk }}风险</span>
+                    </div>
+                    <div style="font-size:13px;color:var(--text-muted);line-height:1.6;">
+                        <div>{{ f.evidence }}</div>
+                        <div style="white-space:pre-wrap;margin-top:4px;color:var(--text-secondary);font-size:12px;">{{ f.suggest }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
             {% if result.mode == 'answer' and result.solution %}
             <div class="result-section">
                 <div class="section-label">完整解题步骤</div>
@@ -375,13 +392,13 @@
         <div class="history-header">分析历史</div>
         {% for item in history %}
         <div class="history-item">
-            <div class="history-input">{{ item[0] }}</div>
+            <div class="history-input">{{ item.title }}</div>
             <div class="history-meta">
-                <span>{{ item[1].category }}</span>
+                <span>{{ item.result.category }}</span>
                 <span>·</span>
-                <span>{{ item[1].technique }}</span>
+                <span>{{ item.result.technique }}</span>
                 <span>·</span>
-                <span style="color: #3fb950;">{{ item[1].difficulty }}</span>
+                <span style="color: #3fb950;">{{ item.result.difficulty }}</span>
             </div>
         </div>
         {% endfor %}

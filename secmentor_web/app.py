@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, request, session, redirect, url_for
 import json
 import requests
@@ -6,10 +7,77 @@ import base64
 app = Flask(__name__)
 app.secret_key = 'secmentor-secret-2026'
 
+basedir = os.path.dirname(os.path.abspath(__file__))
+HISTORY_FILE = os.path.join(basedir, 'history.json')
+MAX_HISTORY = 50
+
+
+# ── 配置加载 ──
 
 def load_config():
-    with open('settings.local.json', 'r', encoding='utf-8') as f:
+    path = os.path.join(basedir, 'settings.local.json')
+    with open(path, 'r', encoding='utf-8') as f:
         return json.load(f)
+
+
+def load_rules():
+    path = os.path.join(basedir, 'rules.json')
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+
+
+RULES = load_rules()
+
+
+# ── 本地规则扫描 ──
+
+def local_scan(text):
+    """用 rules.json 做关键词匹配检测"""
+    findings = []
+    if not text:
+        return findings
+    text_lower = text.lower()
+    for rule in RULES:
+        for kw in rule['keyword']:
+            if kw.lower() in text_lower:
+                findings.append({
+                    'type': rule['type'],
+                    'risk': rule['risk'],
+                    'evidence': rule['evidence'],
+                    'suggest': rule['suggest'],
+                })
+                break
+    return findings
+
+
+# ── 历史记录持久化 ──
+
+def load_history():
+    try:
+        with open(HISTORY_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return []
+
+
+def save_history(history_list):
+    with open(HISTORY_FILE, 'w', encoding='utf-8') as f:
+        json.dump(history_list[-MAX_HISTORY:], f, ensure_ascii=False, indent=2)
+
+
+# ── AI 响应解析 ──
+
+def parse_ai_response(ai_text):
+    """去掉 ``` 代码块标记并解析 JSON"""
+    text = ai_text.strip()
+    if text.startswith('```'):
+        text = text.split('\n', 1)[1]
+    if text.endswith('```'):
+        text = text[:-3]
+    return json.loads(text.strip())
 
 
 def build_prompt(mode):
@@ -72,13 +140,7 @@ def analyze_ctf(description, mode='hint'):
         raise Exception(f'API返回异常: {result}')
 
     ai_text = result['choices'][0]['message']['content'].strip()
-
-    if ai_text.startswith('```'):
-        ai_text = ai_text.split('\n', 1)[1]
-    if ai_text.endswith('```'):
-        ai_text = ai_text[:-3]
-
-    parsed = json.loads(ai_text)
+    parsed = parse_ai_response(ai_text)
     parsed['mode'] = mode
     return parsed
 
@@ -122,19 +184,14 @@ def analyze_image(image_bytes, description, mode='hint'):
     )
 
     result = resp.json()
+
+    if 'choices' not in result:
+        raise Exception(f'SiliconFlow API返回异常: {result}')
+
     ai_text = result['choices'][0]['message']['content'].strip()
-
-    if ai_text.startswith('```'):
-        ai_text = ai_text.split('\n', 1)[1]
-    if ai_text.endswith('```'):
-        ai_text = ai_text[:-3]
-
-    parsed = json.loads(ai_text)
+    parsed = parse_ai_response(ai_text)
     parsed['mode'] = mode
     return parsed
-
-
-history = []
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -148,6 +205,8 @@ def home():
             uploaded_file = request.files.get('file')
 
             try:
+                local_findings = []
+
                 if uploaded_file and uploaded_file.filename:
                     filename = uploaded_file.filename.lower()
                     image_exts = ('.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp')
@@ -161,13 +220,16 @@ def home():
                         full_text = f'文件：{uploaded_file.filename}\n内容：\n{file_content}'
                         if description:
                             full_text = description + '\n' + full_text
+                        local_findings = local_scan(full_text)
                         result = analyze_ctf(full_text, mode)
                         title = f'[{uploaded_file.filename}] {description[:30]}' if description else f'[{uploaded_file.filename}]'
                 elif description.strip():
+                    local_findings = local_scan(description)
                     result = analyze_ctf(description, mode)
                     title = description[:50] + ('...' if len(description) > 50 else '')
                 else:
                     session['result'] = ""
+                    session['local_findings'] = []
                     return redirect(url_for('home'))
             except Exception as e:
                 result = {
@@ -181,20 +243,26 @@ def home():
                 }
                 title = f'[出错] {description[:30]}' if description else '[分析出错]'
 
-            history.append((title, result))
+            history = load_history()
+            history.append({'title': title, 'result': result, 'local_findings': local_findings})
+            save_history(history)
+
             session['result'] = result
+            session['local_findings'] = local_findings
             session['just_cleared'] = False
         elif action == 'clear':
-            history.clear()
+            save_history([])
             session['result'] = ""
+            session['local_findings'] = []
             session['just_cleared'] = True
 
         return redirect(url_for('home'))
 
     result = session.pop('result', "")
-    just_cleared = session.pop('just_cleared', False)
+    local_findings = session.pop('local_findings', [])
+    history = load_history()
 
-    return render_template('index.html', result=result, history=history)
+    return render_template('index.html', result=result, history=history, local_findings=local_findings)
 
 
 if __name__ == '__main__':
